@@ -1,3 +1,3 @@
-name: IPManager
+name: IPIdentify
 version: 1.0
-main: net.chunk64.PingIdentify.IPManager
+main: net.chunk64.IPIdentify.IPIdentify

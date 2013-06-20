@@ -1,5 +1,5 @@
 # IPIdentify config
 
 
-# Print who 
+# Print the IPs + possible users that ping the server in their server list (default: true)
 printPings: true
