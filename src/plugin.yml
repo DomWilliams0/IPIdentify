@@ -1,0 +1,3 @@
+name: IPManager
+version: 1.0
+main: net.chunk64.PingIdentify.IPManager
