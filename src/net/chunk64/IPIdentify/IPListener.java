@@ -5,6 +5,8 @@ import java.util.List;
 
 import net.chunk64.IPIdentify.utils.Utils;
 
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -45,7 +47,7 @@ public class IPListener implements Listener
 		}
 
 		// Save to list and file
-		IPIdentify.ipList.put(ip, ipList);
+		IPIdentify.ipMap.put(ip, ipList);
 		Utils.setToStore(ip, ipList);
 
 		// TODO Alert admins if multiple ips/shares with others
@@ -59,16 +61,21 @@ public class IPListener implements Listener
 			String ip = event.getAddress().getHostAddress();
 
 			// Unknown IP
-			if (!IPIdentify.ipList.containsKey(ip))
+			if (!IPIdentify.ipMap.containsKey(ip))
 			{
 				plugin.getLogger().info("Pinged by unknown IP: " + ip);
 				return;
 			}
 
 			// Known
-			List<String> names = IPIdentify.ipList.get(ip);
+			List<String> names = IPIdentify.ipMap.get(ip);
 
-			plugin.getLogger().info("Pinged by " + ip + ": " + Utils.formatPlayerList(names));
+			String pingMessage = "Ping - " + ip + ": " + Utils.formatPlayerList(names);
+			plugin.getLogger().info(ChatColor.translateAlternateColorCodes('&', pingMessage));
+
+			// Message players with pingalerts
+			for (String s : IPIdentify.pingAlerts)
+				if (Bukkit.getPlayer(s) != null) Bukkit.getPlayer(s).sendMessage(ChatColor.translateAlternateColorCodes('&', IPIdentify.prefix + pingMessage));
 
 		}
 

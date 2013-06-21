@@ -2,8 +2,10 @@ package net.chunk64.IPIdentify;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -16,24 +18,31 @@ public class IPIdentify extends JavaPlugin
 	// Save ips on join
 	// Config option for printing to console
 	// - if more than 3 people per ip, don't send all names - "and x more"
-	//
+	// /looup pl
 
 	// Config variables
 	public static boolean printPings;
 
-	public static Map<String, List<String>> ipList = new HashMap<String, List<String>>();
+	public static Map<String, List<String>> ipMap = new HashMap<String, List<String>>();
+	
+	public static Set<String> pingAlerts = new HashSet<String>();
+	
+	public static String prefix = "&8[&2IPIdentify&8]&7: ";
 
-	public static FileConfiguration ipStore = new YamlConfiguration();
+	public static FileConfiguration ipStore;
 	public static File ipStoreFile;
 
 	public void onEnable()
 	{
 		// Initialize
 		ipStoreFile = new File(getDataFolder(), "ipStore.yml");
-//		ipStore = (ipStoreFile.exists()) ? YamlConfiguration.loadConfiguration(ipStoreFile) : new YamlConfiguration();
-		
+		ipStore = (ipStoreFile.exists()) ? YamlConfiguration.loadConfiguration(ipStoreFile) : new YamlConfiguration();
+
 		// Register events
 		getServer().getPluginManager().registerEvents(new IPListener(this), this);
+		
+		// Register commands
+		getCommand("ipidentify").setExecutor(new IPExecutor(this));
 
 		// Config
 		createConfigs(true);
@@ -91,13 +100,25 @@ public class IPIdentify extends JavaPlugin
 		} catch (Exception e)
 		{
 		}
-		
-		for (String s : ipStore.getKeys(false))
+
+		// Clear current map
+		ipMap.clear();
+
+		// Get every 4th key
+		int count = 0;
+		for (String s : ipStore.getKeys(true))
 		{
-			System.out.println(s);
+			count++;
+			if (count == 4)
+			{
+				count = 0;
+
+				// Add to map
+				List<String> names = ipStore.getStringList(s);
+				ipMap.put(s, names);
+			}
 		}
-		
-		
+
 	}
 
 }
